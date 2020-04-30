@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
 
   _getQuestions() async {
     try {
-      final request= await httpGetRequest("/question/all");
+      final request = await httpGetRequest("/question/all");
       setState(() {
         questionList = jsonDecode(request);
       });
@@ -30,9 +30,7 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => QuestionPage(
-            question: question,
-          ),
+          builder: (context) => QuestionPage(question),
         ));
   }
 

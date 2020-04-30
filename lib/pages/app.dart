@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+//      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -34,7 +34,6 @@ class _MainPageState extends State<MainPage> {
   var _userId;
   int _selectedIndex = 0;
   final pages = [HomePage(), CoursePage(), FavorPage()];
-  List tabs = ["新闻", "历史", "图片"];
 
   _loadUser() async {
     final SharedPreferences prefs = await _prefs;
@@ -42,6 +41,15 @@ class _MainPageState extends State<MainPage> {
     if (_userId == 0) {
       Navigator.pushNamed(context, "/login");
     }
+  }
+
+  _goWriteQuestion() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WriteQuestionPage(),
+      ),
+    );
   }
 
   @override
@@ -59,13 +67,6 @@ class _MainPageState extends State<MainPage> {
     }
 
     return Scaffold(
-//      appBar: AppBar(
-//        title: Text(widget.title),
-//        actions: <Widget>[
-//          IconButton(icon: Icon(Icons.share), onPressed: () {}),
-//        ],
-//      ),
-//      drawer: MyDrawer(),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), title: Text("Home")),
@@ -77,16 +78,10 @@ class _MainPageState extends State<MainPage> {
         currentIndex: _selectedIndex,
         fixedColor: Colors.blue,
         onTap: _onItemTapped,
-//        onTap: _onItemTapped,
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => WriteQuestionPage(),
-          ),
-        ),
+        onPressed: () => _goWriteQuestion(),
       ),
       body: pages[_selectedIndex],
     );

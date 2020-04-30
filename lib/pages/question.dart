@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flu1/pages/answer.dart';
+import 'package:flu1/pages/write_answer.dart';
 import 'package:flu1/utils/httpUtils.dart';
 import 'package:flu1/widgets/round_name.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/rendering.dart';
 class QuestionPage extends StatefulWidget {
   final question;
 
-  QuestionPage({@required this.question});
+  QuestionPage(this.question);
 
   @override
   State<StatefulWidget> createState() => _QuestionPage();
@@ -25,6 +26,16 @@ class _QuestionPage extends State<QuestionPage> {
             builder: (context) => AnswerPage(
                   answer: answer,
                 )));
+  }
+
+  _gotoWriteAnswer() {
+    //todo
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WriteAnswerPage(widget.question["questionId"]),
+      ),
+    ).whenComplete(_getAnswers);
   }
 
   _getAnswers() async {
@@ -102,9 +113,7 @@ class _QuestionPage extends State<QuestionPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.question_answer),
-        onPressed: () {
-          //todo
-        },
+        onPressed: () => _gotoWriteAnswer(),
       ),
       body: CustomScrollView(
         slivers: <Widget>[

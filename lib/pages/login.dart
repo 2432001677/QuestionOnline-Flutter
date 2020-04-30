@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flu1/pojo/loginForm.dart';
 import 'package:flu1/utils/httpUtils.dart';
 import 'package:flu1/widgets/dialogs.dart';
 import 'package:flutter/material.dart';
@@ -44,11 +45,7 @@ class _LoginPage extends State<LoginPage> {
         );
         return;
       }
-      Map<String, String> loginForm = {
-        'userId': usernameController.text,
-        'password': passwdController.text,
-        'school': dropdownValue,
-      };
+      var loginForm=LoginForm.toJsonObj(usernameController.text, passwdController.text, dropdownValue);
       final loginResults = await httpPostRequest("/login", loginForm);
       var results = json.decode(loginResults);
       if (results["result"]) {

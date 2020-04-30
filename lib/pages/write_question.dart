@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flu1/pojo/questionVo.dart';
 import 'package:flu1/utils/httpUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +16,8 @@ class _WriteQuestionPage extends State<WriteQuestionPage> {
   var _prefs = SharedPreferences.getInstance();
   String dropdownValue;
   var classList;
-  var jsonList = [];
+  String _submitTextBtn = "发布问题";
+  var jsonClassList = [];
   var teacherName = "";
 
   _getClassList() async {
@@ -23,18 +25,49 @@ class _WriteQuestionPage extends State<WriteQuestionPage> {
     try {
       var request = await httpGetRequest(
           "/class/my_class/" + (prefs.getInt("userId") ?? 0).toString());
-      jsonList = jsonDecode(request);
+      jsonClassList = jsonDecode(request);
       setState(() {
         classList = <DropdownMenuItem<String>>[];
-        for (var i = 0; i < jsonList.length; i++) {
+        for (var i = 0; i < jsonClassList.length; i++) {
           classList.add(DropdownMenuItem<String>(
             value: i.toString(),
-            child: Text(jsonList[i]["className"]),
+            child: Text(jsonClassList[i]["className"]),
           ));
         }
       });
     } catch (e) {
       print(e);
+    }
+  }
+
+  _submitQuestion() async {
+    try {
+      setState(() {
+        _submitTextBtn = "正在发布";
+      });
+      var pref = await _prefs;
+      var userId = pref.getInt("userId") ?? 0;
+      if (userId == 0 || dropdownValue == null || dropdownValue == "") return;
+      var questionVo = QuestionVo.toJsonObj(
+        "-1",
+        userId.toString(),
+        jsonClassList[int.parse(dropdownValue)]["classId"].toString(),
+        titleController.text,
+        contentController.text,
+      );
+      var request = await httpPostRequest("/question/update", questionVo);
+      var newQuestion = jsonDecode(request);
+      if (newQuestion["questionId"] == null) {
+        print(false);
+        return;
+      }
+      Navigator.pop(context);
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        _submitTextBtn = "发布问题";
+      });
     }
   }
 
@@ -48,10 +81,10 @@ class _WriteQuestionPage extends State<WriteQuestionPage> {
   Widget build(BuildContext context) {
     MaterialButton submitBtn = MaterialButton(
       child: Text(
-        "发布问题",
+        _submitTextBtn,
         style: TextStyle(color: Colors.lightBlue),
       ),
-      onPressed: () {},
+      onPressed: () => _submitQuestion(),
     );
 
     AppBar appBar = AppBar(
@@ -103,7 +136,7 @@ class _WriteQuestionPage extends State<WriteQuestionPage> {
       onChanged: (newValue) {
         setState(() {
           dropdownValue = newValue;
-          teacherName = jsonList[int.parse(newValue)]["teacherName"];
+          teacherName = jsonClassList[int.parse(newValue)]["teacherName"];
         });
       },
       items: classList,
