@@ -14,11 +14,11 @@ const Map<String, String> headers = {
   'Accept': 'application/json',
 };
 
-httpPostRequest(String url, Map<String, String> params) async {
+httpPostRequest(String url, Map<String, String> map) async {
   var client = http.Client();
   final response = await client.post(
     Uri.parse(PREFIX + url),
-    body: json.encode(params),
+    body: json.encode(map),
     headers: headers,
   );
   return utf8.decode(response.bodyBytes);

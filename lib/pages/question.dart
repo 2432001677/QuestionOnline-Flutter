@@ -5,6 +5,7 @@ import 'package:flu1/utils/httpUtils.dart';
 import 'package:flu1/widgets/round_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QuestionPage extends StatefulWidget {
   final question;
@@ -18,6 +19,9 @@ class QuestionPage extends StatefulWidget {
 class _QuestionPage extends State<QuestionPage> {
   var answerList = [];
   var topHeight = 200.0;
+  var _marked = false;
+  var userId = 0;
+  var _prefs = SharedPreferences.getInstance();
 
   _goAnswer(answer) {
     Navigator.push(
@@ -35,6 +39,27 @@ class _QuestionPage extends State<QuestionPage> {
         builder: (context) => WriteAnswerPage(widget.question),
       ),
     ).whenComplete(_getAnswers);
+  }
+
+  _getMark() async {
+    try {
+      var prefs = await SharedPreferences.getInstance();
+      userId = prefs.getInt("userId") ?? 0;
+      if (userId == 0) Navigator.pop(context);
+      var questionId = widget.question["questionId"];
+      final request = await httpGetRequest(
+          "/question/is_marked?uid=$userId&qid=$questionId");
+      setState(() {
+        if (request == "true")
+          _marked = true;
+        else if (request == "false")
+          _marked = false;
+        else
+          Navigator.pop(context);
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   _getAnswers() async {
@@ -66,6 +91,7 @@ class _QuestionPage extends State<QuestionPage> {
 
   @override
   void initState() {
+    _getMark();
     _getAnswers();
     super.initState();
   }
@@ -76,7 +102,32 @@ class _QuestionPage extends State<QuestionPage> {
     final sumWidth = MediaQuery.of(context).size.width;
     final paddingTop = MediaQuery.of(context).padding.top;
 
-    _mark() {}
+    final questionId = widget.question["questionId"];
+
+    Color _markColor = Colors.lightBlueAccent;
+    _mark() async {
+      setState(() {
+        _markColor = Colors.grey;
+      });
+      try {
+        var prefs = await _prefs;
+        var userId = prefs.getInt("userId") ?? 0;
+        if (userId == 0) throw Exception("userId is 0");
+        await httpGetRequest("/question/" +
+            (_marked ? "unmark" : "mark") +
+            "?uid=$userId&qid=$questionId");
+        setState(() {
+          _marked = !_marked;
+        });
+      } catch (e) {
+        print(e);
+      } finally {
+        setState(() {
+          _markColor = Colors.lightBlueAccent;
+        });
+      }
+    }
+
     IconButton backBtn = IconButton(
       icon: Icon(Icons.arrow_back),
       color: Colors.blueAccent,
@@ -85,8 +136,8 @@ class _QuestionPage extends State<QuestionPage> {
       },
     );
     IconButton markBtn = IconButton(
-      icon: Icon(Icons.bookmark_border),
-      color: Colors.lightBlueAccent,
+      icon: _marked ? Icon(Icons.bookmark) : Icon(Icons.bookmark_border),
+      color: _markColor,
       onPressed: () => _mark(),
     );
 
