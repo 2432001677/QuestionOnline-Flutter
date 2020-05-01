@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
           builder: (context) => QuestionPage(question),
-        ));
+        )).whenComplete(_getQuestions);
   }
 
   @override

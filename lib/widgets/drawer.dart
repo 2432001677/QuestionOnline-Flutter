@@ -76,7 +76,8 @@ class _MyDrawer extends State<MyDrawer> {
           children: <Widget>[
             GestureDetector(
               child: accountIcon,
-              onTap: () => Navigator.pushNamed(context, "/login"),
+              onTap: () => Navigator.pushNamed(context, "/login")
+                  .whenComplete(_getUserName),
             ),
             accountManager,
           ],

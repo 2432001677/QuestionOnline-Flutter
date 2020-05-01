@@ -1,3 +1,4 @@
+import 'package:flu1/utils/httpUtils.dart';
 import 'package:flu1/widgets/round_name.dart';
 import 'package:flutter/material.dart';
 
@@ -11,14 +12,22 @@ class AnswerPage extends StatefulWidget {
 }
 
 class _AnswerPage extends State<AnswerPage> {
-  _contentText(str) {
-    return Text(
-      str,
-      style: TextStyle(
-        fontSize: 18,
-        color: Colors.grey[800],
-      ),
-    );
+  var _isSupport = false;
+  var _isNonsupport = false;
+
+  _getMyVote() async {
+    try {
+      //todo
+//      final request=await httpGetRequest("/answer/")
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    _getMyVote();
+    super.initState();
   }
 
   @override
@@ -26,6 +35,20 @@ class _AnswerPage extends State<AnswerPage> {
     final sumHeight = MediaQuery.of(context).size.height;
     final sumWidth = MediaQuery.of(context).size.width;
     final paddingTop = MediaQuery.of(context).padding.top;
+
+    _support() async {}
+
+    _nonsupport() async {}
+
+    _contentText(str) {
+      return Text(
+        str,
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.grey[800],
+        ),
+      );
+    }
 
     Padding contentPad = Padding(
       padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
@@ -50,6 +73,7 @@ class _AnswerPage extends State<AnswerPage> {
     );
 
     AppBar appBar = AppBar(
+      backgroundColor: Colors.lightBlueAccent,
       title: Row(
         children: <Widget>[
           roundName(widget.answer["creatorName"]),
@@ -58,6 +82,25 @@ class _AnswerPage extends State<AnswerPage> {
             child: Text(widget.answer["creatorName"]),
           ),
         ],
+      ),
+    );
+
+    RaisedButton supportNumBtn = RaisedButton(
+      child: Text(
+        widget.answer["supportNum"].toString(),
+        style: TextStyle(
+          color: Colors.blueAccent[700],
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+        ),
+      ),
+      onPressed: () => _support(),
+      color: Colors.lightBlue[50],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+        ),
       ),
     );
 
@@ -70,12 +113,32 @@ class _AnswerPage extends State<AnswerPage> {
           fontSize: 12,
         ),
       ),
-      onPressed: () {
-        print(MediaQuery.of(context).padding.top);
-      },
+      onPressed: () => _support(),
       color: Colors.lightBlue[50],
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+      ),
+    );
+    RaisedButton nonsupportNumBtn = RaisedButton(
+      child: Text(
+        widget.answer["nonsupportNum"].toString(),
+        style: TextStyle(
+          color: Colors.blueAccent[700],
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+        ),
+      ),
+      color: Colors.lightBlue[50],
+      onPressed: () => _nonsupport(),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+        ),
+      ),
     );
     RaisedButton nonsupportBtn = RaisedButton(
       child: Text(
@@ -87,10 +150,25 @@ class _AnswerPage extends State<AnswerPage> {
         ),
       ),
       color: Colors.lightBlue[50],
-      onPressed: () {},
+      onPressed: () => _nonsupport(),
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+      ),
     );
+
+    _numBtnWidth(num) {
+      var t = num ?? 0;
+      var i = 0;
+      do {
+        t = t ~/ 10;
+        i++;
+      } while (t > 0);
+      return i * 8.0 + 30;
+    }
+
     return Scaffold(
       appBar: appBar,
       body: Stack(
@@ -105,8 +183,30 @@ class _AnswerPage extends State<AnswerPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  supportBtn,
-                  nonsupportBtn,
+                  Row(
+                    children: <Widget>[
+                      SizedBox(
+                        width: _numBtnWidth(widget.answer["supportNum"]),
+                        child: supportNumBtn,
+                      ),
+                      SizedBox(
+                        width: 72,
+                        child: supportBtn,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      SizedBox(
+                        width: _numBtnWidth(widget.answer["nonsupportNum"]),
+                        child: nonsupportNumBtn,
+                      ),
+                      SizedBox(
+                        width: 72,
+                        child: nonsupportBtn,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

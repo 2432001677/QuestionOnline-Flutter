@@ -3,7 +3,7 @@ import 'package:flu1/pages/answer.dart';
 import 'package:flu1/pages/write_answer.dart';
 import 'package:flu1/utils/httpUtils.dart';
 import 'package:flu1/utils/timeZoneParse.dart';
-import 'package:flu1/widgets/round_name.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +30,7 @@ class _QuestionPage extends State<QuestionPage> {
         MaterialPageRoute(
             builder: (context) => AnswerPage(
                   answer: answer,
-                )));
+                ))).whenComplete(_init);
   }
 
   _gotoWriteAnswer() {
@@ -90,19 +90,19 @@ class _QuestionPage extends State<QuestionPage> {
     );
   }
 
-  @override
-  void initState() {
+  _init() {
     _getMark();
     _getAnswers();
+  }
+
+  @override
+  void initState() {
+    _init();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-//    final sumHeight = MediaQuery.of(context).size.height;
-//    final paddingTop = MediaQuery.of(context).padding.top;
-    final sumWidth = MediaQuery.of(context).size.width;
-
     final questionId = widget.question["questionId"];
 
     Color _markColor = Colors.lightBlueAccent;
@@ -137,200 +137,204 @@ class _QuestionPage extends State<QuestionPage> {
         Navigator.pop(context);
       },
     );
+
     IconButton markBtn = IconButton(
       icon: _marked ? Icon(Icons.bookmark) : Icon(Icons.bookmark_border),
       color: _markColor,
       onPressed: () => _mark(),
     );
 
-    Padding titlePad = Padding(
-      padding: EdgeInsets.fromLTRB(4, 10, 4, 0),
-      child: Text(
-        widget.question["title"],
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 24,
-        ),
+    Text titleText = Text(
+      widget.question["title"],
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 24,
       ),
     );
 
-    Padding contentPad = Padding(
-      padding: EdgeInsets.fromLTRB(4, 10, 0, 0),
-      child: Text(
-        widget.question["content"],
-      ),
+    Text contentText = Text(
+      widget.question["content"],
+    );
+
+    _userTitle(name) {
+      return Row(
+        children: <Widget>[
+          ClipOval(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircleAvatar(
+                child: Text(
+                  name[0].toUpperCase(),
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+            child: Text(
+              name,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    _noAnswerTip() {
+      if (answerList.length == 0) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+          child: Center(
+            child: Text(
+              "no answer yet",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+              ),
+            ),
+          ),
+        );
+      }
+      return null;
+    }
+
+    AppBar appBar = AppBar(
+      backgroundColor: Colors.white,
+      leading: backBtn,
+      actions: <Widget>[
+        markBtn,
+      ],
     );
 
     return Scaffold(
+      appBar: appBar,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.question_answer),
         onPressed: () => _gotoWriteAnswer(),
       ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            backgroundColor: Colors.transparent,
-            leading: backBtn,
-            centerTitle: true,
-            pinned: true,
-            expandedHeight: topHeight,
-            actions: <Widget>[
-              markBtn,
-            ],
-            flexibleSpace: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(
-                  height: 80,
-                  child: Container(
-                    color: Colors.white,
+      body: ListView.builder(
+        itemCount: answerList.length + 1,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0)
+            return ListTile(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                    child: titleText,
                   ),
-                ),
-                titlePad,
-                contentPad,
-                Padding(
-                  padding: EdgeInsets.fromLTRB(4, 10, 4, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          roundName(widget.question["userName"]),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                            child: Text(widget.question["userName"]),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          _weight800Text((answerList.length ?? 0).toString()),
-                          _greyText("回答"),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          _weight800Text(widget.question["markNum"].toString()),
-                          _greyText("收藏"),
-                        ],
-                      ),
-                    ],
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                    child: contentText,
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      _greyText(widget.question["className"]),
-                      _greyText(addEightHour(widget.question["createDate"])),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SliverFixedExtentList(
-            itemExtent: 125,
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return GestureDetector(
-                  onTap: () => _goAnswer(answerList[index]),
-                  child: Container(
-                    margin: EdgeInsets.fromLTRB(2, 0, 2, 10),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      // 边框
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        //阴影
-                        BoxShadow(
-                          blurRadius: 3, //阴影范围
-                          spreadRadius: 0.2, //阴影浓度
-                          color: Colors.grey,
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        _userTitle(widget.question["userName"]),
+                        Row(
+                          children: <Widget>[
+                            _weight800Text((answerList.length ?? 0).toString()),
+                            _greyText("回答"),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            _weight800Text(
+                                widget.question["markNum"].toString()),
+                            _greyText("收藏"),
+                          ],
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 8, 0, 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        _greyText(widget.question["className"]),
+                        _greyText(addEightHour(widget.question["createDate"])),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              subtitle: _noAnswerTip(),
+            );
+          return ListTile(
+            subtitle: GestureDetector(
+              onTap: () => _goAnswer(answerList[index - 1]),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  // 边框
+                  border: Border.all(
+                    color: Colors.grey,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    //阴影
+                    BoxShadow(
+                      blurRadius: 3, //阴影范围
+                      spreadRadius: 0.2, //阴影浓度
+                      color: Colors.grey,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(4, 5, 4, 0),
+                      child: _userTitle(answerList[index - 1]["creatorName"]),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(4, 6, 4, 0),
+                      child: Text(
+                        answerList[index - 1]["content"],
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(4, 6, 4, 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              ClipOval(
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircleAvatar(
-                                    child: Text(
-                                      answerList[index]["creatorName"][0]
-                                          .toUpperCase(),
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                child: Text(
-                                  answerList[index]["creatorName"],
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(0, 7, 0, 0),
-                            child: SizedBox(
-                              height: 42,
-                              child: Container(
-                                constraints: BoxConstraints(
-                                  minWidth: sumWidth,
-                                ),
-                                child: Text(
-                                  answerList[index]["content"],
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Row(
-                            children: <Widget>[
-                              _greyText(
-                                  answerList[index]["supportNum"].toString()),
+                              _greyText(answerList[index - 1]["supportNum"]
+                                  .toString()),
                               _greyText("赞同"),
                               SizedBox(
                                 width: 10,
                               ),
-                              _greyText(answerList[index]["nonsupportNum"]
+                              _greyText(answerList[index - 1]["nonsupportNum"]
                                   .toString()),
                               _greyText("反对"),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              _greyText(addEightHour(
-                                  answerList[index]["createDate"])),
                             ],
+                          ),
+                          _greyText(
+                            addEightHour(answerList[index - 1]["createDate"]),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                );
-              },
-              childCount: answerList.length,
+                    )
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
