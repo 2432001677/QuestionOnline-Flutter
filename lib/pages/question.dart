@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flu1/pages/answer.dart';
 import 'package:flu1/pages/write_answer.dart';
 import 'package:flu1/utils/httpUtils.dart';
+import 'package:flu1/utils/timeZoneParse.dart';
 import 'package:flu1/widgets/round_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -98,9 +99,9 @@ class _QuestionPage extends State<QuestionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final sumHeight = MediaQuery.of(context).size.height;
+//    final sumHeight = MediaQuery.of(context).size.height;
+//    final paddingTop = MediaQuery.of(context).padding.top;
     final sumWidth = MediaQuery.of(context).size.width;
-    final paddingTop = MediaQuery.of(context).padding.top;
 
     final questionId = widget.question["questionId"];
 
@@ -117,6 +118,7 @@ class _QuestionPage extends State<QuestionPage> {
             (_marked ? "unmark" : "mark") +
             "?uid=$userId&qid=$questionId");
         setState(() {
+          widget.question["markNum"] += _marked ? -1 : 1;
           _marked = !_marked;
         });
       } catch (e) {
@@ -203,8 +205,7 @@ class _QuestionPage extends State<QuestionPage> {
                       ),
                       Row(
                         children: <Widget>[
-                          _weight800Text(
-                              widget.question["answerNum"].toString()),
+                          _weight800Text((answerList.length ?? 0).toString()),
                           _greyText("回答"),
                         ],
                       ),
@@ -223,9 +224,7 @@ class _QuestionPage extends State<QuestionPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       _greyText(widget.question["className"]),
-                      _greyText(widget.question["createDate"]
-                          .substring(0, 16)
-                          .replaceFirst("T", " ")),
+                      _greyText(addEightHour(widget.question["createDate"])),
                     ],
                   ),
                 ),
@@ -233,7 +232,7 @@ class _QuestionPage extends State<QuestionPage> {
             ),
           ),
           SliverFixedExtentList(
-            itemExtent: 120,
+            itemExtent: 125,
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
                 return GestureDetector(
@@ -318,9 +317,8 @@ class _QuestionPage extends State<QuestionPage> {
                               SizedBox(
                                 width: 10,
                               ),
-                              _greyText(answerList[index]["createDate"]
-                                  .substring(0, 16)
-                                  .replaceFirst("T", " ")),
+                              _greyText(addEightHour(
+                                  answerList[index]["createDate"])),
                             ],
                           ),
                         ],

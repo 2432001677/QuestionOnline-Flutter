@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flu1/pages/question.dart';
 import 'package:flu1/utils/httpUtils.dart';
+import 'package:flu1/utils/timeZoneParse.dart';
 import 'package:flu1/widgets/drawer.dart';
 import 'package:flu1/widgets/round_name.dart';
 import 'package:flutter/material.dart';
@@ -164,9 +165,7 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(color: Colors.grey),
                               ),
                               Text(
-                                questionList[index]["createDate"]
-                                    .substring(0, 16)
-                                    .replaceFirst("T", " "),
+                                addEightHour(questionList[index]["createDate"]),
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ],
