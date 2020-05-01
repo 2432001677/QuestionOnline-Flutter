@@ -88,7 +88,7 @@ class _WriteQuestionPage extends State<WriteQuestionPage> {
     );
 
     AppBar appBar = AppBar(
-      backgroundColor: Colors.white70,
+      backgroundColor: Colors.grey[200],
       leading: IconButton(
         icon: Icon(Icons.close),
         color: Colors.blueAccent,
@@ -102,7 +102,7 @@ class _WriteQuestionPage extends State<WriteQuestionPage> {
     );
 
     TextField textTitle = TextField(
-//      autofocus: true,
+      autofocus: true,
       decoration: InputDecoration(
         hintText: "input a simple description here",
         border: OutlineInputBorder(

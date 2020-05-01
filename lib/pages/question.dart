@@ -29,11 +29,10 @@ class _QuestionPage extends State<QuestionPage> {
   }
 
   _gotoWriteAnswer() {
-    //todo
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => WriteAnswerPage(widget.question["questionId"]),
+        builder: (context) => WriteAnswerPage(widget.question),
       ),
     ).whenComplete(_getAnswers);
   }
