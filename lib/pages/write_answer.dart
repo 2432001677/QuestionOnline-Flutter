@@ -7,8 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class WriteAnswerPage extends StatefulWidget {
   final question;
+  final answer;
 
-  WriteAnswerPage(this.question);
+  WriteAnswerPage(this.question, {this.answer});
 
   @override
   State<StatefulWidget> createState() => _WriteAnswerPage();
@@ -16,14 +17,20 @@ class WriteAnswerPage extends StatefulWidget {
 
 class _WriteAnswerPage extends State<WriteAnswerPage> {
   var _prefs = SharedPreferences.getInstance();
+  final contentController = TextEditingController();
+
+  @override
+  void initState() {
+    if (widget.answer != null)
+      contentController.text = widget.answer["content"];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final sumHeight = MediaQuery.of(context).size.height;
     final sumWidth = MediaQuery.of(context).size.width;
     final paddingTop = MediaQuery.of(context).padding.top;
-
-    final contentController = TextEditingController();
 
     _close() {
       Navigator.pop(context);

@@ -4,6 +4,7 @@ import 'package:flu1/utils/httpUtils.dart';
 import 'package:flu1/utils/timeZoneParse.dart';
 import 'package:flu1/widgets/drawer.dart';
 import 'package:flu1/widgets/round_name.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -78,11 +79,6 @@ class _HomePageState extends State<HomePage> {
             pinned: false,
             snap: true,
             expandedHeight: 250,
-//            flexibleSpace: Column(
-//              children: <Widget>[
-//                Text("Question Online"),
-//              ],
-//            ),
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 "Question Online",
@@ -126,13 +122,18 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            questionList[index]["title"],
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                questionList[index]["title"],
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
                           Row(
                             children: <Widget>[

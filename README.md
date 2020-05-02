@@ -1,16 +1,22 @@
-# flu1
+# Question Online
 
-A new Flutter project.
+Developed by [bruce•yu](https://2432001677.github.io/)  
 
-## Getting Started
+A Flutter application like Quora or 知乎.  
 
-This project is a starting point for a Flutter application.
+> OS: `windows 10`  
+> flutter: `v1.12.13+hotfix.9`  
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Getting Started  
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![home](./resources/homepage.png)  
+
+![login page](./resources/login.png)  
+
+![question page](./resources/question.png)  
+
+![question writting page](./resources/write_question.png)  
+
+![answer writting page](./resources/write_answer.png)  

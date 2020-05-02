@@ -34,10 +34,20 @@ class _QuestionPage extends State<QuestionPage> {
   }
 
   _gotoWriteAnswer() {
+    var myAns;
+    for (var ans in answerList) {
+      if (ans["creator"] == userId) {
+        myAns=ans;
+        break;
+      }
+    }
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => WriteAnswerPage(widget.question),
+        builder: (context) => WriteAnswerPage(
+          widget.question,
+          answer: myAns,
+        ),
       ),
     ).whenComplete(_getAnswers);
   }
