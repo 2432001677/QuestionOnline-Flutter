@@ -6,6 +6,7 @@ import 'package:flu1/utils/timeZoneParse.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QuestionPage extends StatefulWidget {
@@ -37,7 +38,7 @@ class _QuestionPage extends State<QuestionPage> {
     var myAns;
     for (var ans in answerList) {
       if (ans["creator"] == userId) {
-        myAns=ans;
+        myAns = ans;
         break;
       }
     }
@@ -228,123 +229,128 @@ class _QuestionPage extends State<QuestionPage> {
         child: Icon(Icons.question_answer),
         onPressed: () => _gotoWriteAnswer(),
       ),
-      body: ListView.builder(
-        itemCount: answerList.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0)
-            return ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                    child: titleText,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
-                    child: contentText,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _userTitle(widget.question["userName"]),
-                        Row(
-                          children: <Widget>[
-                            _weight800Text((answerList.length ?? 0).toString()),
-                            _greyText("回答"),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            _weight800Text(
-                                widget.question["markNum"].toString()),
-                            _greyText("收藏"),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 8, 0, 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _greyText(widget.question["className"]),
-                        _greyText(addEightHour(widget.question["createDate"])),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              subtitle: _noAnswerTip(),
-            );
-          return ListTile(
-            subtitle: GestureDetector(
-              onTap: () => _goAnswer(answerList[index - 1]),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  // 边框
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    //阴影
-                    BoxShadow(
-                      blurRadius: 3, //阴影范围
-                      spreadRadius: 0.2, //阴影浓度
-                      color: Colors.grey,
-                    ),
-                  ],
-                ),
-                child: Column(
+      body: EasyRefresh(
+        onRefresh: ()async {_init();},
+        child: ListView.builder(
+          itemCount: answerList.length + 1,
+          itemBuilder: (BuildContext context, int index) {
+            if (index == 0)
+              return ListTile(
+                title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.fromLTRB(4, 5, 4, 0),
-                      child: _userTitle(answerList[index - 1]["creatorName"]),
+                      padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      child: titleText,
                     ),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(4, 6, 4, 0),
-                      child: Text(
-                        answerList[index - 1]["content"],
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                      child: contentText,
                     ),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(4, 6, 4, 5),
+                      padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
+                          _userTitle(widget.question["userName"]),
                           Row(
                             children: <Widget>[
-                              _greyText(answerList[index - 1]["supportNum"]
-                                  .toString()),
-                              _greyText("赞同"),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              _greyText(answerList[index - 1]["nonsupportNum"]
-                                  .toString()),
-                              _greyText("反对"),
+                              _weight800Text(
+                                  (answerList.length ?? 0).toString()),
+                              _greyText("回答"),
                             ],
                           ),
-                          _greyText(
-                            addEightHour(answerList[index - 1]["createDate"]),
+                          Row(
+                            children: <Widget>[
+                              _weight800Text(
+                                  widget.question["markNum"].toString()),
+                              _greyText("收藏"),
+                            ],
                           ),
                         ],
                       ),
-                    )
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 8, 0, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _greyText(widget.question["className"]),
+                          _greyText(
+                              addEightHour(widget.question["createDate"])),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
+                subtitle: _noAnswerTip(),
+              );
+            return ListTile(
+              subtitle: GestureDetector(
+                onTap: () => _goAnswer(answerList[index - 1]),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    // 边框
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      //阴影
+                      BoxShadow(
+                        blurRadius: 3, //阴影范围
+                        spreadRadius: 0.2, //阴影浓度
+                        color: Colors.grey,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(4, 5, 4, 0),
+                        child: _userTitle(answerList[index - 1]["creatorName"]),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(4, 6, 4, 0),
+                        child: Text(
+                          answerList[index - 1]["content"],
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(4, 6, 4, 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                _greyText(answerList[index - 1]["supportNum"]
+                                    .toString()),
+                                _greyText("赞同"),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                _greyText(answerList[index - 1]["nonsupportNum"]
+                                    .toString()),
+                                _greyText("反对"),
+                              ],
+                            ),
+                            _greyText(
+                              addEightHour(answerList[index - 1]["createDate"]),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
