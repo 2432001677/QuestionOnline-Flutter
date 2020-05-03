@@ -23,6 +23,7 @@ class _QuestionPage extends State<QuestionPage> {
   var topHeight = 200.0;
   var _marked = false;
   var userId = 0;
+  var _answerTip = "no answer yet";
   var _prefs = SharedPreferences.getInstance();
 
   _goAnswer(answer) {
@@ -75,6 +76,9 @@ class _QuestionPage extends State<QuestionPage> {
   }
 
   _getAnswers() async {
+    setState(() {
+      _answerTip = "loading...";
+    });
     try {
       final request = await httpGetRequest(
           "/answer/" + widget.question["questionId"].toString());
@@ -84,6 +88,12 @@ class _QuestionPage extends State<QuestionPage> {
       });
     } catch (e) {
       print(e);
+    } finally {
+      if (answerList == null || answerList.length == 0) {
+        setState(() {
+          _answerTip = "no answer yet";
+        });
+      }
     }
   }
 
@@ -203,7 +213,7 @@ class _QuestionPage extends State<QuestionPage> {
           padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
           child: Center(
             child: Text(
-              "no answer yet",
+              _answerTip,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 20,
@@ -230,7 +240,9 @@ class _QuestionPage extends State<QuestionPage> {
         onPressed: () => _gotoWriteAnswer(),
       ),
       body: EasyRefresh(
-        onRefresh: ()async {_init();},
+        onRefresh: () async {
+          _init();
+        },
         child: ListView.builder(
           itemCount: answerList.length + 1,
           itemBuilder: (BuildContext context, int index) {

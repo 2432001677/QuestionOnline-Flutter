@@ -48,11 +48,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  Row questionRow = Row(
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: <Widget>[],
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,7 +80,7 @@ class _HomePageState extends State<HomePage> {
               floating: true,
               pinned: false,
               snap: true,
-              expandedHeight: 250,
+              expandedHeight: 280,
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   "Question Online",
@@ -95,8 +90,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 background: Image.asset(
                   "imgs/home.jpg",
-                  height: 210,
-                  fit: BoxFit.fitWidth,
+                  fit: BoxFit.fitHeight,
                 ),
               ),
             ),
